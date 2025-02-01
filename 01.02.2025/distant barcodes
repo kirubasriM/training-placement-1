@@ -1,0 +1,24 @@
+int cmp(const void *a, const void *b){ return(*(int*)b - *(int*)a); }
+int* rearrangeBarcodes(int* barcodes, int barcodesSize, int* returnSize) {
+    int* cnt = (int*)calloc(1e4+1, sizeof(int));
+    int maxValue = 0;
+    for(int i = 0; i < barcodesSize; i++){
+        cnt[barcodes[i]] = (cnt[barcodes[i]] + 0x10000) | barcodes[i];
+        maxValue = fmax(maxValue, barcodes[i]);
+    }
+    qsort(cnt, maxValue+1, sizeof(int), cmp);
+    int idx = 0, bIdx = 0;
+    while(cnt[idx]){
+        int currValue = cnt[idx] & 0xFFFF;
+        cnt[idx] >>= 16;
+        for(int i = 0; i < cnt[idx]; i++){
+            barcodes[bIdx] = currValue;
+            bIdx += 2;
+            if(bIdx >= barcodesSize)
+                bIdx = 1;            
+        }
+        cnt[idx++] = 0;// clear then for next
+    }
+    *returnSize = barcodesSize;
+    return barcodes;
+}
