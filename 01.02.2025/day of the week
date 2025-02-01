@@ -1,0 +1,27 @@
+char* dayOfTheWeek(int days, int month, int year) {
+    char* findDay(int num) {
+        char* arr[] = {"Thursday", "Friday",  "Saturday", "Sunday",
+                       "Monday",   "Tuesday", "Wednesday"};
+        return arr[num];
+    }
+
+    for (int i = 1971; i < year; i++) {
+        if ((i % 4 == 0) && (i % 100 != 0 || i % 400 == 0))
+            days += 366;
+        else
+            days += 365;
+    }
+
+    for (int i = 1; i < month; i++) {
+        if (i == 2)
+            if ((year % 4 == 0) && (year % 100 != 0 || year % 400 == 0))
+                days += 29;
+            else
+                days += 28;
+        else if (i == 4 || i == 6 || i == 9 || i == 11)
+            days += 30;
+        else
+            days += 31;
+    }
+    return findDay(days % 7);
+}
