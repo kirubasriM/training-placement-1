@@ -1,0 +1,19 @@
+int maxSatisfied(int* a, int n, int* b, int grumpySize, int k) {
+    int max = 0;
+    for(int i = 0; i < k; i++){
+        max += a[i];
+    }
+    for(int i = k; i < n; i++){
+        max += (a[i]*(!b[i]));
+    }
+    int start = 0;
+    int end = k-1;
+    int val = max;
+    while(end < n-1){
+        val += -a[start]*b[start] + a[end+1]*(b[end+1]);
+        end++;
+        start++;
+        max = max > val ? max : val;
+    }
+    return max;
+}
