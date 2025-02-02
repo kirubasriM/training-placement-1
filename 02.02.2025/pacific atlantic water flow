@@ -1,0 +1,68 @@
+static void _dfs(int **grid, int **heights, int n, int m, int x, int y, int v) {
+    grid[y][x] |= v;
+
+    if (x > 0 && heights[y][x - 1] >= heights[y][x] && !(grid[y][x - 1] & v))
+        _dfs(grid, heights, n, m, x - 1, y, v);
+        
+    if (x < n - 1 && heights[y][x + 1] >= heights[y][x] && !(grid[y][x + 1] & v))
+        _dfs(grid, heights, n, m, x + 1, y, v);
+        
+    if (y > 0 && heights[y - 1][x] >= heights[y][x] && !(grid[y - 1][x] & v))
+        _dfs(grid, heights, n, m, x, y - 1, v);
+        
+    if (y < m - 1 && heights[y + 1][x] >= heights[y][x] && !(grid[y + 1][x] & v))
+        _dfs(grid, heights, n, m, x, y + 1, v);
+}
+
+int** pacificAtlantic(int** heights, int heightsSize, int* heightsColSize, int* returnSize, int** returnColumnSizes) {
+    // n == width  m = height
+    int n = heightsColSize[0], m = heightsSize;
+
+    int **grid = calloc(m, sizeof(*grid));
+    for (int i = 0; i < m; i++)
+        grid[i] = calloc(n, sizeof(**grid));
+
+    for (int i = 0; i < n; i++) {
+        if (!(grid[0][i] & 1))
+            _dfs(grid, heights, n, m, i, 0, 1);
+
+        if (!(grid[m - 1][i] & 2))
+            _dfs(grid, heights, n, m, i, m - 1, 2);
+    }
+
+    for (int i = 0; i < m; i++) {
+        if (!(grid[i][0] & 1))
+            _dfs(grid, heights, n, m, 0, i, 1);
+
+        if (!(grid[i][n - 1] & 2))
+            _dfs(grid, heights, n, m, n - 1, i, 2);
+    }
+
+    *returnSize = 0;
+    int **result = calloc(n * m, sizeof(*result));
+    *returnColumnSizes = calloc(n * m, sizeof(**returnColumnSizes));
+
+    for (int x = 0; x < n; x++) {
+        for (int y = 0; y < m; y++) {
+            if (grid[y][x] == 3) {
+                int *new = calloc(2, sizeof(*new));
+
+                new[0] = y;
+                new[1] = x;
+
+                (*returnColumnSizes)[*returnSize] = 2;
+                result[*returnSize] = new;
+                *returnSize += 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < m; i++)
+        free(grid[i]);
+    free(grid);
+
+    result = reallocarray(result, *returnSize, sizeof(*result));
+    *returnColumnSizes = reallocarray(*returnColumnSizes, *returnSize, sizeof(**returnColumnSizes));
+
+    return result;
+}
