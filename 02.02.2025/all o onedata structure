@@ -1,0 +1,156 @@
+
+typedef struct all {
+    char a[11];
+    int count;
+    struct all* next;
+    struct all* prev;
+} all;
+
+typedef struct {
+    all *head, *rear;
+} AllOne;
+
+all* createnode(char* key) {
+    all* newnode = (all*)malloc(sizeof(all));
+    strcpy(newnode->a, key);
+    newnode->count=1;
+    newnode->next = NULL;
+    newnode->prev = NULL;
+    return newnode;
+}
+AllOne* allOneCreate() {
+    AllOne* newnode = (AllOne*)malloc(sizeof(AllOne));
+    newnode->head = NULL;
+    newnode->rear = NULL;
+    return newnode;
+}
+
+void allOneInc(AllOne* obj, char* key) {
+    all*temp=obj->head;
+    while(temp!=NULL){
+        if(!strcmp(temp->a,key)){
+            temp->count++;
+            // free(temp);
+            return;
+        }
+        temp=temp->next;
+    }
+
+    all* inc = createnode(key);
+    if (!inc) {
+        return;
+    }
+
+
+    
+    inc->next=obj->head;
+    inc->prev=NULL;
+    if(obj->head==NULL){
+        obj->rear=inc;
+    }else{
+        obj->head->prev=inc;
+    }
+    obj->head=inc;
+}
+
+// void allOneDec(AllOne* obj, char* key) {
+//      if (obj->head == NULL) {
+//         return ;
+//     }
+//     all*temp=obj->head;
+//     while(temp!=NULL){
+//         if(!strcmp(temp->a,key)){
+//             temp--;
+//             free(temp);
+//             return;
+//         }
+//     }
+// }
+
+
+void allOneDec(AllOne* obj, char* key) {
+    if (obj->head == NULL) {
+        return; // Nothing to decrement
+    }
+
+    all* temp = obj->head;
+    while (temp != NULL) {
+        if (strcmp(temp->a, key) == 0) {
+            temp->count--;
+            if (temp->count == 0) {
+                // Remove the node
+                if (temp->prev != NULL) {
+                    temp->prev->next = temp->next; // Link previous to next
+                } else {
+                    obj->head = temp->next; // Update head if removing the first node
+                }
+                if (temp->next != NULL) {
+                    temp->next->prev = temp->prev; // Link next to previous
+                } else {
+                    obj->rear = temp->prev; // Update rear if removing the last node
+                }
+                free(temp); // Free the node
+            }
+            return; // Exit after decrementing
+        }
+        temp = temp->next;
+    }
+}
+
+char* allOneGetMaxKey(AllOne* obj) {
+    if (obj->head == NULL) {
+        return "";
+    }
+    
+    all*temp=obj->head;
+    all*maxkey=temp;
+    while(temp!=NULL){
+        if(temp->count>maxkey->count){
+            maxkey=temp;
+        }
+        temp=temp->next;
+    }
+    
+    
+    return maxkey->a;
+    
+}
+
+char* allOneGetMinKey(AllOne* obj) {
+    if (obj->head == NULL) {
+        return "";
+    }
+     all*temp=obj->head;
+    all*minkey=temp;
+    while(temp!=NULL){
+        if(temp->count<minkey->count){
+            minkey=temp;
+        }
+        temp=temp->next;
+    }
+    return minkey->a;
+}
+
+void allOneFree(AllOne* obj) {
+    all* node = obj->head;
+    while (node != NULL) {
+        all* temp = node->next;
+        free(node);
+        node = temp;
+    }
+    free(obj);
+}
+
+/**
+ * Your AllOne struct will be instantiated and called as such:
+ * AllOne* obj = allOneCreate();
+ * allOneInc(obj, key);
+
+ * allOneDec(obj, key);
+
+ * char* param_3 = allOneGetMaxKey(obj);
+
+ * char* param_4 = allOneGetMinKey(obj);
+
+ * allOneFree(obj);
+*/
