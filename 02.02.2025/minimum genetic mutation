@@ -1,0 +1,73 @@
+#define max_len  8
+#define max_gene 4
+
+char* endGene;
+char** list;
+char** bank;
+int bankSize;
+int* visited;
+int cnt;
+int step;
+char* option;
+
+int checkInList(char* str) {
+    for (int i = 0; i < bankSize; i++) {
+        if ((visited[i] != -1) && (0 == strcmp(str, bank[i]))) return i;
+    }
+    return -1;
+}
+
+int checkMutation(int start, int end) {
+
+    if (start == end) return -1;
+
+    char buf[max_len +1]; // +1 for the '\0'
+    for (int i = start; i < end; i++) {
+        char* gene = list[i];
+        if (0 == strcmp(gene, endGene)) return step;
+
+        for (int j = 0; j < max_len; j++) {
+            for (int k = 0; k < max_gene; k++) {
+                strcpy(buf, gene);
+                if (buf[j] == option[k]) continue;
+                
+                buf[j] = option[k];
+                for (int m = 0; m < bankSize; m++) {
+                    int id = checkInList(buf);
+                    if (-1 != id) {
+                        visited[id] = -1;
+                        list[cnt] = bank[id];
+                        cnt++;
+                    }
+                }
+            }
+        }
+    }
+    step++;
+    return checkMutation(end, cnt);
+}
+
+int minMutation(char* startG, char* endG, char** b, int bSize) {
+    // first, check if endGene is in the list, if not, return -1
+    int n = bSize;
+    int id_e = -1;
+    while (n--) {
+        if (0 == strcmp(endG, b[n])) id_e = n;
+    }
+    if (id_e == -1) return -1;
+    
+    bank = b;
+    bankSize = bSize;
+    endGene = endG;
+    option = "ACGT";
+    int buf[bSize];
+    memset(buf, 0, sizeof(buf));
+    visited = buf;
+    list = calloc(bSize +1, sizeof(char*)); // +1 for the startGene
+    list[0] = startG;
+    cnt = 1; // list object number,
+             // 1 is for startGene stored in list
+    step = 0;
+
+    return checkMutation(0,1);
+}
