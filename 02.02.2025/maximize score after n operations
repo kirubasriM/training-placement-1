@@ -1,0 +1,57 @@
+// euclids gcd algorithm
+int gcd(int a, int b)
+{
+    int temp;
+    while (b != 0)
+    {
+        temp = a % b;
+        a = b;
+        b = temp;
+    }
+    return a;
+}
+// recursive backtrack implementation
+int backtrack(int* nums, int numsSize, int mask, int pairs, int* memo){
+    if (2*pairs == numsSize){
+        return 0;
+    }
+    // only search new sub problems
+    if (memo[mask] == -1){
+        int maxScore = 0;
+        // search for best score out of remaining nums
+        for (int i = 0; i < numsSize; i++){
+            for (int j = i+1; j < numsSize; j++){
+                if (mask >> i & 1 == 1 || mask >> j & 1 == 1){
+                    continue;
+                }
+                int new_mask, curr_score, remaining_score;
+                // new mask excludes current pair and previous pairs
+                new_mask = mask | (1 << i) | (1 << j);
+                // get added score from current pair
+                curr_score = gcd(nums[i], nums[j]) * (pairs + 1);
+                // get best possible score for remaining nums
+                remaining_score = backtrack(nums, numsSize, new_mask, pairs + 1, memo);
+                // update maxScore
+                if (remaining_score + curr_score > maxScore){
+                    maxScore = remaining_score + curr_score;
+                }
+            }
+        
+        }
+        memo[mask] = maxScore;
+    }
+    return memo[mask];
+}
+
+
+int maxScore(int* nums, int numsSize){
+    // memoSize == 2^(numsSize)
+    int  ans, memoSize = 1<<numsSize;
+    int* memo = malloc(sizeof(int)*memoSize);
+    for (int i = 0; i < memoSize; i ++){
+        memo[i] = -1;
+    }
+    ans = backtrack(nums, numsSize, 0, 0, memo);
+    free(memo);
+    return ans;
+}
