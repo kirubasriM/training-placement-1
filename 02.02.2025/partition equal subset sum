@@ -1,0 +1,40 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
+bool canPartition(int* nums, int numsSize) {
+    int sum = 0;
+
+    // Calculate total sum
+    for (int i = 0; i < numsSize; i++) {
+        sum += nums[i];
+    }
+
+    // If the total sum is odd, we cannot partition
+    if (sum % 2 != 0) {
+        return false;
+    }
+
+    int target = sum / 2;
+
+    // Use a static array for small memory overhead
+    bool dp[target + 1];
+    for (int i = 0; i <= target; i++) {
+        dp[i] = false;
+    }
+    dp[0] = true; // Base case: sum 0 is always achievable
+
+    // Process each number in the array
+    for (int i = 0; i < numsSize; i++) {
+        // Update dp array from back to front
+        for (int j = target; j >= nums[i]; j--) {
+            dp[j] = dp[j] || dp[j - nums[i]];
+        }
+
+        // Early exit if target is achievable
+        if (dp[target]) {
+            return true;
+        }
+    }
+
+    return dp[target];
+}
