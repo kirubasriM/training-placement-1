@@ -1,0 +1,83 @@
+typedef struct NODE
+{
+    int val;
+    struct NODE * next;
+} NODE;
+
+/* CUSTOM char compare function for qsort */
+int cmpfunc (const void * a, const void * b) {
+   return ( *(char*)a - *(char*)b );
+}
+
+/* CUSTOM int compare function for qsort */
+int cmpIntfunc(const void * a, const void * b) {
+   return ( *(int*)a - *(int*)b );
+}
+
+void trav(char * s, int i, int* indList, int* ilc, char* chList, int* clc, int* visited, NODE** adjacent)
+{
+    visited[i] = 1;
+
+    for (NODE * curr = adjacent[i]; curr != NULL; curr = curr->next)
+    {
+        if (visited[curr->val])
+            continue;
+        indList[(*ilc)++] = curr->val;
+        chList[(*clc)++] = s[curr->val];
+        trav(s, curr->val, indList, ilc, chList, clc, visited, adjacent);
+    }
+}
+
+char * smallestStringWithSwaps(char * s, int** pairs, int pairsSize, int* pairsColSize)
+{
+    int i;
+    int len = strlen(s);
+    int visited[len];
+    NODE* adjacent[len];
+
+    for (i = 0; i < len; i++)
+    {
+        visited[i] = 0;
+        adjacent[i] = NULL;
+    }
+    
+    for (i = 0; i < pairsSize; i++)
+    {
+        NODE* n1 = malloc(sizeof(NODE));
+        n1->next = adjacent[pairs[i][0]];
+        adjacent[pairs[i][0]] = n1;
+        n1->val = pairs[i][1];
+
+        NODE* n2 = malloc(sizeof(NODE));
+        n2->next = adjacent[pairs[i][1]];
+        adjacent[pairs[i][1]] = n2;
+        n2->val = pairs[i][0];
+    }
+
+    int * indList = malloc(sizeof(int) * len);
+    char * chList = malloc(sizeof(char) * (len + 1));
+    int ilc = 0;
+    int clc = 0;
+
+    memset(chList, '\0', sizeof(char) * (len + 1));
+
+    for (i = 0; i < len; i++)
+    {
+        if (visited[i])
+            continue;
+
+        indList[0] = i;
+        chList[0] = s[i];
+        ilc = clc = 1;
+
+        trav(s, i, indList, &ilc, chList, &clc, visited, adjacent);
+
+        qsort(indList, ilc, sizeof(int), cmpIntfunc);
+        qsort(chList, clc, sizeof(char), cmpfunc);
+
+        for (int k = 0; k < clc; k++)
+            s[indList[k]] = chList[k];    
+    }
+
+    return s;
+}
