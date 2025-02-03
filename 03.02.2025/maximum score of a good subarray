@@ -1,0 +1,12 @@
+int maximumScore(int* nums, int numsSize, int k) {
+    int max = INT_MIN; // Initialize max to the smallest possible value
+    for (int i = k, j = k, min = nums[k];;) {
+        max = fmax(max, min * (j - i + 1)); // Update max
+        if (i == 0 && j == numsSize - 1) break; // Exit loop if both pointers reach boundaries
+        int left = (i == 0 || (j != numsSize - 1 && nums[i - 1] < nums[j + 1])); // Check if moving left is preferable
+        int right = !left; // If not moving left, then moving right
+        if (left) min = fmin(min, nums[++j]); // Update min and move pointer accordingly
+        else min = fmin(min, nums[--i]); // Update min and move pointer accordingly
+    }
+    return max;
+}
