@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+
+int maxScore(char *s) {
+    int n = strlen(s);
+    int totalOnes = 0, maxScore = 0;
+
+    // Count total number of ones in the string
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '1') {
+            totalOnes++;
+        }
+    }
+
+    int leftZeros = 0, rightOnes = totalOnes;
+
+    // Iterate through the string, splitting at each position
+    for (int i = 0; i < n - 1; i++) { // Avoid splitting at the last character
+        if (s[i] == '0') {
+            leftZeros++;
+        } else {
+            rightOnes--;
+        }
+
+        int currentScore = leftZeros + rightOnes;
+        if (currentScore > maxScore) {
+            maxScore = currentScore;
+        }
+    }
+
+    return maxScore;
+}
