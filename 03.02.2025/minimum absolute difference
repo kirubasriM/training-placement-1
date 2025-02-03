@@ -1,0 +1,63 @@
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+ 
+void quicksort(int* array,int low,int high){
+    if (low >= high) {
+        return;
+    }
+    int num=array[low],temp;
+    int i=low,j=high;
+
+    while(i<j){
+        while(array[j]>=num &&  i < j){
+            j--;
+        }
+        while(array[i]<=num && i<j){
+            i++;
+        }
+        if(i<j){
+            temp=array[i];
+            array[i]=array[j];
+            array[j]=temp;
+        }
+    }
+    array[low]=array[i];
+    array[i]=num;
+    quicksort(array,low,j-1);
+    quicksort(array,j+1,high);    
+}
+int** minimumAbsDifference(int* arr, int arrSize, int* returnSize, int** returnColumnSizes) {
+    
+    quicksort(arr,0,arrSize-1);
+    int value=arr[1]-arr[0],count=0;
+
+    for(int i=0;i<arrSize-1;i++){
+        int diff=arr[i+1]-arr[i];
+        if(value>diff){
+            value=diff;
+            count=0;
+        }
+        if(value==diff)
+            count++;
+    }
+    *returnSize=count;
+    *returnColumnSizes=malloc(*returnSize*sizeof(int));
+    int **result=malloc(*returnSize*sizeof(int*));
+
+    for (int i = 0; i < *returnSize; i++) {
+        (*returnColumnSizes)[i] = 2;
+        result[i] = malloc(2 * sizeof(int));
+    }
+    count=0;
+    for(int i=0;i<arrSize-1;i++){
+        if(arr[i+1]-arr[i]==value){
+            result[count][0]=arr[i];
+            result[count][1]=arr[i+1];
+            count++;
+        }
+    }
+    return result;
+}
